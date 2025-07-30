@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Animated Dragon Form</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <style>
+    /* Reset and Basic Body Styles */
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      color: white;
+      overflow-x: hidden; /* Prevent horizontal scrollbar caused by Swiper or other elements */
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Background Video Specifics - Desktop Video (Default) */
+    #desktop-bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      display: block; /* Shown by default on desktop */
+    }
+
+    /* Background Video Specifics - Mobile Video (Hidden by default) */
+    #mobile-bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      display: none; /* Hidden by default, shown only on mobile */
+    }
+
+    /* Form Container Layout */
+    .form-container {
+      height: auto;
+      min-height: 77vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      margin: 80px auto; /* Margin for overall container */
+      max-width: 550px; /* Limit width */
+      padding: 0 15px; /* Add horizontal padding to container */
+    }
+
+    /* Form Styling */
+    form {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      border-radius: 20px;
+      border: 3px solid transparent;
+      animation: glow 2s infinite ease-in-out;
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      color: #fff;
+    }
+
+    /* Glow Animation for Form */
+    @keyframes glow {
+      0% {
+        border-color: #00ffe1;
+        box-shadow: 0 0 10px #00ffe1;
+      }
+      50% {
+        border-color: #ff00c3;
+        box-shadow: 0 0 20px #ff00c3;
+      }
+      100% {
+        border-color: #00ffe1;
+        box-shadow: 0 0 10px #00ffe1;
+      }
+    }
+
+    /* Form Group for labels and inputs */
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .form-group label {
+        font-size: 0.9em;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Input Field & Textarea Styling */
+    form input, form textarea {
+      padding: 10px 14px;
+      outline: none;
+      border: .5px solid #FC5438;
+      background: #FC543814;
+      color: #fff !important;
+      border-radius: 22px;
+      resize: vertical;
+      min-height: 40px;
+    }
+    form input::placeholder, form textarea::placeholder{
+      color: #fff !important;
+    }
+    form input:focus, form textarea:focus {
+      color: #fff !important;
+      background: #FC543814 !important;
+    }
+
+    /* Button Styling */
+    form button {
+      padding: 10px 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+      border: .5px solid #FC5438;
+      background: #FC543814;
+      color: #fff !important;
+      border-radius: 22px;
+    }
+    form button:hover {
+      background: #ff00c3;
+      color: white;
+    }
+
+    /* Camera Box Layout */
+    .camera-box {
+      text-align: center;
+      position: relative;
+      display: flex; /* Use flex for internal alignment */
+      flex-direction: column;
+      gap: 10px;
+      align-items: center; /* Center items horizontally */
+    }
+    #startCameraBtn {
+        width: auto; /* Allow button to size based on content */
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+
+    /* Camera Feed and Snapshot */
+    #camera {
+      width: 100%;
+      border-radius: 10px;
+      display: none; /* Controlled by JS */
+    }
+    #snapshot {
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
+      display: none; /* Controlled by JS */
+    }
+
+    /* Red Circle (Capture Button) */
+    .red-circle {
+      width: 60px;
+      height: 60px;
+      background-color: transparent;
+      border-radius: 50%;
+      cursor: pointer;
+      margin: 10px auto;
+      display: none; /* Controlled by JS */
+      border: 3px solid red;
+      box-shadow: 0 0 10px red;
+      animation: border-blink 1.2s infinite alternate;
+      transition: transform 0.2s ease;
+    }
+
+    /* Animation for red circle border */
+    @keyframes border-blink {
+      0% {
+        box-shadow: 0 0 5px red;
+      }
+      50% {
+        box-shadow: 0 0 20px red, 0 0 30px red;
+      }
+      100% {
+        box-shadow: 0 0 5px red;
+      }
+    }
+    .red-circle:hover {
+      transform: scale(1.1);
+    }
+
+    /* Timer for Camera Capture */
+    #timer {
+      font-size: 24px;
+      color: red;
+      font-weight: bold;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: none;
+      background: rgba(0,0,0,0.5);
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    /* Table Styling for Desktop */
+    #dataTable {
+      width: 100%;
+      margin-top: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      border-collapse: collapse;
+      max-width: 550px;
+      color: #fff;
+    }
+    #dataTable th, #dataTable td {
+      padding: 8px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      word-wrap: break-word; /* Ensure text wraps */
+      hyphens: auto; /* Allow hyphenation */
+    }
+    #dataTable th {
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+    img.thumb {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    /* Edit/Delete/Save Button Group (Desktop) */
+    .edit-del {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+    }
+    .edit-del button{
+      background-color:transparent;
+      padding: 5px;
+      border: none;
+    }
+    .edit-del button i {
+      color: chocolate;
+      cursor: pointer;
+      font-size: 1.2em;
+    }
+    .edit-del button.save-btn i {
+      color: #00ffe1;
+    }
+
+    /* Styles for editable table cells */
+    td[contenteditable="true"] {
+      border: 1px solid #ff00c3 !important;
+      padding: 7px !important;
+      outline: none;
+      background-color: rgba(255,255,255,0.1); /* Slight background for editable cells */
+    }
+
+    /* Success Message Styling */
+    #success-message {
+        display: none;
+        background-color: #4CAF50; /* Green */
+        color: white;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        text-align: center;
+        font-weight: bold;
+        width: 100%; /* Ensure it spans full width */
+        box-sizing: border-box; /* Include padding in width */
+    }
+
+    /* --- MOBILE-SPECIFIC STYLES FOR TABLE (CARDS + SWIPER) --- */
+    #mobileDataTableContainer {
+      display: none; /* Hidden by default, shown by JS/media query */
+      width: 100%;
+      margin-top: 30px;
+      color: #fff;
+    }
+
+    .swiper-container {
+      width: 100%;
+      padding-bottom: 40px; /* Space for pagination */
+    }
+    .swiper-slide {
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start; 
+    box-shadow: 0 0 15px rgba(0, 255, 225, 0.5); 
+    height: auto; / Allow slide height to adjust 
+    border: 3px solid transparent; 
+    animation: glow 2s infinite ease-in-out; 
+    }
+
+    .swiper-slide .card-item {
+      display: flex;
+      align-items: flex-start; /* Align label and value at start */
+      gap: 10px;
+      width: 100%; /* Ensure each item takes full width */
+      flex-wrap: wrap; /* Allow content to wrap */
+      padding-bottom: 5px; /* Spacing between items */
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1); /* Subtle separator */
+    }
+
+    .swiper-slide .card-item:last-of-type {
+      border-bottom: none; /* No border for the last item */
+    }
+
+    .swiper-slide .card-item strong {
+      min-width: 90px; /* Give labels a fixed width for alignment */
+      color: #ff00c3; /* Highlight labels */
+      font-size: 0.9em;
+      flex-shrink: 0; /* Prevent label from shrinking */
+    }
+
+    .swiper-slide .card-item span,
+    .swiper-slide .card-item textarea[contenteditable="true"] {
+      flex-grow: 1; /* Allow content to take remaining space */
+      text-align: left;
+      font-size: 0.95em;
+      line-height: 1.4;
+      color: #fff;
+    }
+    .swiper-slide .card-item textarea[contenteditable="true"] {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid #ff00c3;
+      padding: 5px;
+      border-radius: 5px;
+      outline: none;
+      width: 100%; /* Ensure text area takes full width when editable */
+      min-height: 50px; /* Give textarea some height */
+    }
+
+
+    .swiper-slide img.thumb {
+      width: 60px; /* Slightly larger thumbnail on cards */
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-bottom: 10px; /* Space below image */
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .swiper-slide .card-actions {
+      display: flex;
+      justify-content: center; /* Center action buttons */
+      gap: 10px;
+      width: 100%;
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .swiper-slide .card-actions button {
+      background: #FC543814;
+      border: .5px solid #FC5438;
+      border-radius: 20px;
+      padding: 8px 15px;
+      color: #fff;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: background 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .swiper-slide .card-actions button:hover {
+      background: #ff00c3;
+    }
+    .swiper-slide .card-actions button.edit-btn i {
+      color: chocolate;
+    }
+    .swiper-slide .card-actions button.delete-btn i {
+      color: #f44336;
+    }
+    .swiper-slide .card-actions button.save-btn {
+      background: #00ffe11A;
+      border-color: #00ffe1;
+    }
+    .swiper-slide .card-actions button.save-btn i {
+      color: #00ffe1;
+    }
+
+    /* Swiper Pagination Styling */
+    .swiper-pagination-bullet {
+      background-color: rgba(255, 255, 255, 0.4);
+      opacity: 1;
+    }
+    .swiper-pagination{
+      bottom: -5%!important;
+    }
+    .swiper-pagination-bullet-active {
+      background-color: #00ffe1;
+    }
+
+    /* Swiper Navigation Arrows (optional, uncomment if you want them) */
+    /* .swiper-button-next, .swiper-button-prev {
+      color: #00ffe1;
+    } */
+
+
+    /* Media Queries for Responsiveness */
+    @media (max-width: 550px) { /* Changed from 500px to 550px to align with max-width of form container */
+      /* Hide desktop video and show mobile video */
+      #desktop-bg-video {
+        display: none;
+      }
+      #mobile-bg-video {
+        display: block; /* Show mobile video */
+      }
+      
+      .form-container {
+        margin: 20px auto;
+        padding: 0 10px; /* Reduced padding for very small screens */
+      }
+      form{
+        padding: 20px;
+        width: 95%;
+        max-width: none; /* Let it take full width of container */
+      }
+      #dataTable {
+        display: none; /* Hide the traditional table on mobile */
+      }
+      #mobileDataTableContainer {
+        display: block; /* Show the Swiper container on mobile */
+      }
+      .swiper-container {
+          padding: 30px 20px; 
+          overflow: hidden;/* Adjust pagination space if needed */
+      }
+      
+      .swiper-slide {
+          padding: 15px; /* Reduce slide padding */
+          gap: 10px; /* Reduce gap between card items */
+      }
+      .swiper-slide .card-item strong {
+          min-width: 80px; /* Adjust label width */
+          font-size: 0.85em;
+      }
+      .swiper-slide .card-item span {
+          font-size: 0.9em;
+      }
+      .swiper-slide img.thumb {
+          width: 50px;
+          height: 50px;
+      }
+      .swiper-slide .card-actions {
+          margin-top: 10px;
+          gap: 5px;
+      }
+      .swiper-slide .card-actions button {
+          padding: 6px 10px;
+          font-size: 0.8em;
+      }
+      .swiper-pagination-bullet {
+        width: 8px; /* Smaller pagination dots */
+        height: 8px;
+      }
+      .swiper-wrapper{
+        margin-right: -15px!important;
+      }
+    }
+
+    /* Styles for editable content within cards */
+    .swiper-slide span[contenteditable="true"] {
+        border: 1px solid #ff00c3 !important;
+        padding: 4px;
+        border-radius: 5px;
+        outline: none;
+        background-color: rgba(255,255,255,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <video autoplay muted loop id="desktop-bg-video">
+    <source src="dragon.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+
+  <video autoplay muted loop id="mobile-bg-video">
+    <source src="for--mobile.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="form-container">
+    <div id="success-message"></div>
+
+    <form action="https://formsubmit.co/talharjp707@gmail.com" method="POST" id="userForm">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="https://formsubmit.co/thank-you.html">
+
+      <h2>Register Now</h2>
+
+      <div class="form-group">
+        <label for="first-name">First Name:</label>
+        <input type="text" id="first-name" name="First Name" placeholder="Enter your first name" required />
+      </div>
+
+      <div class="form-group">
+        <label for="last-name">Last Name:</label>
+        <input type="text" id="last-name" name="Last Name" placeholder="Enter your last name" required />
+      </div>
+
+      <div class="form-group">
+        <label for="name">Full Name (from original form):</label>
+        <input type="text" id="name" name="Full Name (Original)" placeholder="Full Name (original)" />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address:</label>
+        <input type="email" id="email" name="Email" placeholder="Email Address" required />
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number:</label>
+        <input type="tel" id="phone" name="Phone Number" placeholder="Phone Number" required />
+      </div>
+
+      <div class="form-group">
+        <label for="message">Message:</label>
+        <textarea id="message" name="Message" placeholder="Enter your message" required></textarea>
+      </div>
+
+      <input type="hidden" id="imageDataInput" name="Image (Base64 String)" />
+
+      <div class="camera-box">
+        <video id="camera" autoplay></video>
+        <div id="timer">3</div>
+        <button type="button" id="startCameraBtn">📸 Open Camera</button>
+        <div class="red-circle" id="captureBtn"></div>
+        <canvas id="snapshot" style="display: none;"></canvas>
+      </div>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <table id="dataTable">
+      <thead>
+        <tr class="table-title">
+          <th>Image</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Message</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div id="mobileDataTableContainer">
+      <div class="swiper-container">
+        <div class="swiper-wrapper" id="mobileTableBody">
+          </div>
+        <div class="swiper-pagination"></div>
+        </div>
+    </div>
+  </div>
+      </div> 
+        <footer style="color: #ff00c3; text-align: center; padding: 0px 20px 20px; margin-top: 0px; background: rgba(0, 0, 0, 0.5);">
+      <p>Copy Claim made by <a href="https://www.instagram.com/talha_official13/">@Talha Rajpoot</a> &copy; 2025<span id="current-year"></span></p>
+    </footer>
+
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script>
+    const video = document.getElementById('camera');
+    const canvas = document.getElementById('snapshot');
+    const ctx = canvas.getContext('2d');
+    const timer = document.getElementById('timer');
+    const startCameraBtn = document.getElementById('startCameraBtn');
+    const captureBtn = document.getElementById('captureBtn');
+    const imageDataInput = document.getElementById('imageDataInput');
+    const successMessageDiv = document.getElementById('success-message');
+    const desktopTable = document.getElementById('dataTable');
+    const mobileTableContainer = document.getElementById('mobileDataTableContainer');
+    const desktopTableBody = document.querySelector("#dataTable tbody");
+    const mobileTableBody = document.getElementById('mobileTableBody');
+
+    let streamStarted = false;
+    let imageData = ""; // Stores base64 image data for local display and conversion
+    let currentEditIndex = -1; // To keep track of the row/card being edited
+    let mySwiper = null; // Swiper instance
+
+    // Media Query for responsiveness
+    const mediaQuery = window.matchMedia('(max-width: 550px)');
+
+    // --- Camera Functionality (remains mostly the same) ---
+    startCameraBtn.addEventListener('click', async () => {
+      if (!streamStarted) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          video.srcObject = stream;
+          video.style.display = 'block';
+          captureBtn.style.display = 'block';
+          startCameraBtn.style.display = 'none';
+          streamStarted = true;
+        } catch (err) {
+          alert("Camera access denied. Please allow camera access to use this feature.");
+          console.error("Camera access error:", err);
+        }
+      }
+    });
+
+    captureBtn.addEventListener('click', () => {
+      timer.style.display = 'block';
+      let countdown = 3;
+      timer.textContent = countdown;
+
+      const interval = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+          clearInterval(interval);
+          timer.style.display = 'none';
+          takePhoto();
+          // If in edit mode and image is updated, apply it immediately
+          if (currentEditIndex !== -1) {
+            updateRow(currentEditIndex, true);
+            stopCamera(video.srcObject); // Stop camera after capture for edit mode
+          }
+        } else {
+          timer.textContent = countdown;
+        }
+      }, 1000);
+    });
+
+    function takePhoto() {
+      canvas.style.display = 'block';
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      // Use JPEG and lower quality to reduce size for email attachment
+      imageData = canvas.toDataURL('image/jpeg', 0.7); // 0.7 means 70% quality
+      imageDataInput.value = imageData; // Store in hidden input for local consistency if needed
+    }
+
+    function stopCamera(stream) {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        streamStarted = false;
+      }
+      video.style.display = 'none';
+      captureBtn.style.display = 'none';
+      startCameraBtn.style.display = 'block';
+      canvas.style.display = 'none'; // Also hide canvas when stopping camera
+    }
+
+    // --- Local Storage and Table/Card Functionality ---
+    const form = document.getElementById('userForm');
+
+    function saveToLocal(data) {
+      const existing = JSON.parse(localStorage.getItem("formData") || "[]");
+      existing.push(data);
+      localStorage.setItem("formData", JSON.stringify(existing));
+    }
+
+    function loadTable() {
+      const data = JSON.parse(localStorage.getItem("formData") || "[]");
+
+      // Clear both table and mobile view
+      desktopTableBody.innerHTML = "";
+      mobileTableBody.innerHTML = "";
+
+      // Destroy existing Swiper instance if it exists
+      if (mySwiper) {
+        mySwiper.destroy(true, true);
+        mySwiper = null;
+      }
+
+      if (mediaQuery.matches) {
+        // Mobile View: Render as Swiper Cards
+        desktopTable.style.display = 'none';
+        mobileTableContainer.style.display = 'block';
+
+        data.forEach((item, index) => {
+          const slide = document.createElement("div");
+          slide.className = "swiper-slide";
+          slide.setAttribute('data-index', index); // Add data-index for easy reference
+
+          slide.innerHTML = `
+            <img src="${item.image}" class="thumb" id="img-mobile-${index}" />
+            <div class="card-item"><strong>First Name:</strong> <span id="first-name-mobile-${index}">${item.firstName || ''}</span></div>
+            <div class="card-item"><strong>Last Name:</strong> <span id="last-name-mobile-${index}">${item.lastName || ''}</span></div>
+            <div class="card-item"><strong>Full Name:</strong> <span id="full-name-mobile-${index}">${item.fullName || ''}</span></div>
+            <div class="card-item"><strong>Email:</strong> <span id="email-mobile-${index}">${item.email}</span></div>
+            <div class="card-item"><strong>Phone:</strong> <span id="phone-mobile-${index}">${item.phone}</span></div>
+            <div class="card-item"><strong>Message:</strong> <span id="message-mobile-${index}">${item.message || ''}</span></div>
+            <div class="card-actions">
+              <button onclick="editRow(${index})" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+              <button onclick="deleteRow(${index})" class="delete-btn"><i class="fa-solid fa-trash"></i> Delete</button>
+              <button onclick="saveEditedRow(${index})" class="save-btn" style="display:none;"><i class="fa-solid fa-save"></i> Save</button>
+            </div>
+          `;
+          mobileTableBody.appendChild(slide);
+        });
+
+        // Initialize Swiper ONLY if there's data
+        if (data.length > 0) {
+          mySwiper = new Swiper('.swiper-container', {
+            slidesPerView: 1,
+            spaceBetween: 20, // Space between cards
+            pagination: {
+              el: '.swiper-pagination',
+              clickable: true,
+            },
+            // navigation: { // Uncomment if you want arrows
+            //   nextEl: '.swiper-button-next',
+            //   prevEl: '.swiper-button-prev',
+            // },
+          });
+        } else {
+            mobileTableBody.innerHTML = `<div class="swiper-slide" style="text-align: center;">No data to display.</div>`;
+        }
+
+      } else {
+        // Desktop View: Render as Traditional Table
+        desktopTable.style.display = 'table';
+        mobileTableContainer.style.display = 'none';
+
+        data.forEach((item, index) => {
+          const row = document.createElement("tr");
+          row.setAttribute('data-index', index); // Add data-index for easy reference
+          row.innerHTML = `
+            <td><img src="${item.image}" class="thumb" id="img-${index}" /></td>
+            <td contenteditable="false" id="first-name-${index}">${item.firstName || ''}</td>
+            <td contenteditable="false" id="last-name-${index}">${item.lastName || ''}</td>
+            <td contenteditable="false" id="full-name-${index}">${item.fullName || ''}</td>
+            <td contenteditable="false" id="email-${index}">${item.email}</td>
+            <td contenteditable="false" id="phone-${index}">${item.phone}</td>
+            <td contenteditable="false" id="message-${index}">${item.message || ''}</td>
+            <td class="edit-del">
+              <button onclick="editRow(${index})" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick="deleteRow(${index})" class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+              <button onclick="saveEditedRow(${index})" class="save-btn" style="display:none;"><i class="fa-solid fa-save"></i></button>
+            </td>
+          `;
+          desktopTableBody.appendChild(row);
+        });
+      }
+    }
+
+    function editRow(index) {
+      currentEditIndex = index;
+
+      let targetElement;
+      if (mediaQuery.matches) { // Mobile view
+        targetElement = mobileTableBody.querySelector(`.swiper-slide[data-index="${index}"]`);
+      } else { // Desktop view
+        targetElement = desktopTableBody.querySelector(`tr[data-index="${index}"]`);
+      }
+
+      const firstNameCell = targetElement.querySelector(`[id^="first-name-"]`);
+      const lastNameCell = targetElement.querySelector(`[id^="last-name-"]`);
+      const fullNameCell = targetElement.querySelector(`[id^="full-name-"]`);
+      const emailCell = targetElement.querySelector(`[id^="email-"]`);
+      const phoneCell = targetElement.querySelector(`[id^="phone-"]`);
+      const messageCell = targetElement.querySelector(`[id^="message-"]`);
+
+      const editButton = targetElement.querySelector('.edit-btn');
+      const deleteButton = targetElement.querySelector('.delete-btn');
+      const saveButton = targetElement.querySelector('.save-btn');
+
+      [firstNameCell, lastNameCell, fullNameCell, emailCell, phoneCell, messageCell].forEach(cell => {
+          cell.contentEditable = true;
+          if (!mediaQuery.matches) { // Apply border only to desktop table cells
+              cell.style.border = '1px solid #ff00c3';
+              cell.style.padding = '7px';
+          }
+      });
+
+      editButton.style.display = 'none';
+      deleteButton.style.display = 'none';
+      saveButton.style.display = 'inline-block';
+
+      // Prompt to update image
+      const confirmUpdateImage = window.confirm("Do you want to update the image as well?");
+      if (confirmUpdateImage) {
+        startCameraBtn.style.display = 'block';
+        captureBtn.style.display = 'block';
+        video.style.display = 'block';
+        if (!streamStarted) {
+            navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                video.srcObject = stream;
+                streamStarted = true;
+            }).catch(err => {
+                alert("Camera access denied. Cannot update image.");
+                startCameraBtn.style.display = 'none';
+                captureBtn.style.display = 'none';
+                video.style.display = 'none';
+            });
+        }
+      } else {
+        startCameraBtn.style.display = 'none';
+        captureBtn.style.display = 'none';
+        video.style.display = 'none';
+        if (video.srcObject) {
+          stopCamera(video.srcObject);
+        }
+      }
+    }
+
+    function saveEditedRow(index) {
+      updateRow(index, false); // Pass false for imageUpdated, as image is handled by captureBtn logic
+
+      let targetElement;
+      if (mediaQuery.matches) { // Mobile view
+        targetElement = mobileTableBody.querySelector(`.swiper-slide[data-index="${index}"]`);
+      } else { // Desktop view
+        targetElement = desktopTableBody.querySelector(`tr[data-index="${index}"]`);
+      }
+
+      const firstNameCell = targetElement.querySelector(`[id^="first-name-"]`);
+      const lastNameCell = targetElement.querySelector(`[id^="last-name-"]`);
+      const fullNameCell = targetElement.querySelector(`[id^="full-name-"]`);
+      const emailCell = targetElement.querySelector(`[id^="email-"]`);
+      const phoneCell = targetElement.querySelector(`[id^="phone-"]`);
+      const messageCell = targetElement.querySelector(`[id^="message-"]`);
+
+      const editButton = targetElement.querySelector('.edit-btn');
+      const deleteButton = targetElement.querySelector('.delete-btn');
+      const saveButton = targetElement.querySelector('.save-btn');
+
+      [firstNameCell, lastNameCell, fullNameCell, emailCell, phoneCell, messageCell].forEach(cell => {
+          cell.contentEditable = false;
+          if (!mediaQuery.matches) {
+              cell.style.border = '';
+              cell.style.padding = '8px';
+          }
+      });
+
+      editButton.style.display = 'inline-block';
+      deleteButton.style.display = 'inline-block';
+      saveButton.style.display = 'none';
+
+      startCameraBtn.style.display = 'none';
+      captureBtn.style.display = 'none';
+      video.style.display = 'none';
+      if (video.srcObject) {
+          stopCamera(video.srcObject);
+      }
+      currentEditIndex = -1; // Reset edit index
+    }
+
+    function updateRow(index, imageWasJustCaptured) {
+      const data = JSON.parse(localStorage.getItem("formData") || "[]");
+
+      let currentImageSrc;
+      if (mediaQuery.matches) {
+          currentImageSrc = document.getElementById(`img-mobile-${index}`).src;
+      } else {
+          currentImageSrc = document.getElementById(`img-${index}`).src;
+      }
+
+      data[index] = {
+        firstName: document.querySelector(`[id^="first-name-"][id$="-${index}"]`).textContent.trim(),
+        lastName: document.querySelector(`[id^="last-name-"][id$="-${index}"]`).textContent.trim(),
+        fullName: document.querySelector(`[id^="full-name-"][id$="-${index}"]`).textContent.trim(),
+        email: document.querySelector(`[id^="email-"][id$="-${index}"]`).textContent.trim(),
+        phone: document.querySelector(`[id^="phone-"][id$="-${index}"]`).textContent.trim(),
+        message: document.querySelector(`[id^="message-"][id$="-${index}"]`).textContent.trim(),
+        image: imageWasJustCaptured ? imageData : currentImageSrc // Use new imageData if captured, else existing
+      };
+
+      localStorage.setItem("formData", JSON.stringify(data));
+      loadTable(); // Reload the table/cards
+      imageData = ""; // Clear image data after use
+      imageDataInput.value = ""; // Clear the hidden input value
+    }
+
+    function deleteRow(index) {
+      const data = JSON.parse(localStorage.getItem("formData") || "[]");
+      data.splice(index, 1);
+      localStorage.setItem("formData", JSON.stringify(data));
+      loadTable(); // Reload the table/cards
+    }
+
+    // --- Form Submission Logic (using fetch API) ---
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault(); // Prevent default form submission to handle it with JavaScript
+
+      // Get all form field values
+      const firstName = document.getElementById('first-name').value.trim();
+      const lastName = document.getElementById('last-name').value.trim();
+      const fullName = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      // Validate if image is captured IF camera was opened AND image is required
+      if (startCameraBtn.style.display === 'none' && !imageData) {
+        alert("Please capture your image before submitting, or ensure the camera is closed if not required.");
+        return; // Stop the submission
+      }
+
+      // Create FormData object to send to Formsubmit.co
+      const formData = new FormData();
+      formData.append('_captcha', 'false');
+      formData.append('_next', 'https://formsubmit.co/thank-you.html'); // Optional, but good practice
+
+      // Append all form fields with their respective names (these names appear in your email)
+      formData.append('First Name', firstName);
+      formData.append('Last Name', lastName);
+      formData.append('Full Name (Original)', fullName);
+      formData.append('Email', email);
+      formData.append('Phone Number', phone);
+      formData.append('Message', message);
+
+      // --- CRITICAL CHANGE FOR IMAGE ATTACHMENT ---
+      if (imageData) {
+          try {
+              // Convert base64 data to a Blob (file-like object)
+              const response = await fetch(imageData); // Fetch the data URL
+              const blob = await response.blob(); // Get the Blob
+
+              // Append the Blob as a file to FormData. Formsubmit.co will treat this as an attachment.
+              // 'User Snapshot' will be the name of the attachment in the email.
+              formData.append('User Snapshot', blob, 'user_snapshot.jpeg');
+              console.log("Image converted to Blob and appended as 'user_snapshot.jpeg'");
+          } catch (imgError) {
+              console.error("Error converting image data to Blob for submission:", imgError);
+              alert("Could not process image for submission. Please try again.");
+              return; // Stop submission if image processing fails
+          }
+      }
+
+      // For debugging: Log formData entries before sending
+      console.log("Sending data to Formsubmit.co:");
+      for (let pair of formData.entries()) {
+          // Log string values normally, log Blob/File objects with their name/type/size
+          if (typeof pair[1] === 'string') {
+              console.log(pair[0]+ ': ' + pair[1].substring(0, 100) + (pair[1].length > 100 ? '...' : ''));
+          } else {
+              console.log(pair[0]+ ': ' + pair[1].name + ' (' + pair[1].type + ', ' + pair[1].size + ' bytes)');
+          }
+      }
+
+      try {
+          const response = await fetch(form.action, {
+              method: 'POST',
+              body: formData,
+              // Important: Do NOT set Content-Type header when sending FormData with fetch.
+              // The browser sets it automatically, including the boundary for file uploads.
+          });
+
+          // Check the actual response from Formsubmit.co
+          if (response.ok || response.redirected) { // Formsubmit.co often returns a redirect
+              console.log("Form submitted to Formsubmit.co successfully! Status:", response.status);
+              console.log("Response URL:", response.url);
+
+              // 1. Show success message
+              successMessageDiv.textContent = "Your form submitted successfully!";
+              successMessageDiv.style.backgroundColor = '#4CAF50'; // Green for success
+              successMessageDiv.style.display = 'block';
+              setTimeout(() => {
+                  successMessageDiv.style.display = 'none'; // Hide message after 5 seconds
+              }, 5000);
+
+              // 2. Save data to local table
+              const entry = {
+                  firstName,
+                  lastName,
+                  fullName,
+                  email,
+                  phone,
+                  message,
+                  // For local table, store base64 or a placeholder if no image was captured
+                  image: imageData || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=' // Transparent 1x1 pixel if no image
+              };
+              saveToLocal(entry);
+              loadTable(); // Update the table/cards with new data
+
+              // 3. Clear the form fields
+              form.reset();
+              canvas.style.display = 'none';
+              imageData = ""; // Clear the stored image data
+              imageDataInput.value = ""; // Clear the hidden input value
+              // Stop camera if it was active
+              if (video.srcObject) {
+                  stopCamera(video.srcObject);
+              }
+
+          } else {
+              // Formsubmit.co returned an error (e.g., specific HTTP status code)
+              console.error("Form submission failed with response status:", response.status, response.statusText);
+              const errorText = await response.text();
+              console.error("Formsubmit.co error response body:", errorText); // Log raw response for debugging
+
+              successMessageDiv.textContent = "Form submission failed. Please try again. (Error: " + response.status + ")";
+              successMessageDiv.style.backgroundColor = '#f44336'; // Red for error
+              successMessageDiv.style.display = 'block';
+              setTimeout(() => {
+                  successMessageDiv.style.display = 'none';
+              }, 8000); // Keep error message longer
+          }
+      } catch (error) {
+          // Network error (e.g., ERR_QUIC_PROTOCOL_ERROR, no internet)
+          console.error("Network error during form submission:", error);
+          successMessageDiv.textContent = "A network error occurred. Please check your internet connection and try again. If using Chrome, try disabling 'Experimental QUIC protocol' in chrome://flags.";
+          successMessageDiv.style.backgroundColor = '#f44336'; // Red for error
+          successMessageDiv.style.display = 'block';
+          setTimeout(() => {
+              successMessageDiv.style.display = 'none';
+          }, 10000); // Keep network error message longer
+      }
+    });
+
+    // --- Event listener for screen size changes ---
+    mediaQuery.addEventListener('change', loadTable); // Reload table/cards when media query matches/unmatches
+
+    // Initial load based on screen size
+    window.addEventListener("DOMContentLoaded", loadTable);
+  </script>
+
+</body>
+</html>
